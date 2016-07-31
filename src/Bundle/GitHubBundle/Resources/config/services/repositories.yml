@@ -1,0 +1,12 @@
+services:
+  visca.bot.component.git_hub.pull_request.merging.repository.pull_request_merge:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Repository\PullRequestMergeRepository
+    arguments:
+      - "@visca.bot.git_hub.api.repo"
+      - "@visca.bot.git_hub.api.pull_request"
+      - "@visca.bot.git_hub.api.issue"
+
+  visca.bot.component.git_hub.repositories.statuses:
+    class: Visca\Bot\Component\GitHub\Repositories\StatusesRepository
+    arguments:
+      - '@visca.bot.git_hub.api.repo'

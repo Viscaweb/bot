@@ -29,7 +29,9 @@
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "^2.0",
         "knplabs/github-api": "^1.7",
-        "php-http/guzzle6-adapter": "^1.1"
+        "php-http/guzzle6-adapter": "^1.1",
+        "php-amqplib/rabbitmq-bundle": "^1.10",
+        "simple-bus/rabbitmq-bundle-bridge": "^3.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

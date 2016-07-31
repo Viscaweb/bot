@@ -1,0 +1,18 @@
+services:
+  # Handlers
+  visca.bot.component.git_hub.pull_request.merging.command.handler.merge_pull_request:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Command\Handler\MergePullRequestCommandHandler
+    arguments:
+      - "@visca.bot.component.git_hub.pull_request.merging.repository.pull_request_merge"
+      - "@visca.bot.component.git_hub.pull_request.merging.pull_request_merger"
+      - "@asynchronous_command_bus"
+    tags:
+      - { name: asynchronous_command_handler, handles: Visca\Bot\Component\GitHub\PullRequest\Merging\Command\Command\MergePullRequestCommand }
+
+  visca.bot.component.git_hub.pull_request.merging.command.handler.rebase_pull_request_command_handler:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Command\Handler\RebasePullRequestCommandHandler
+    arguments:
+      - '@visca.bot.git_hub.api.repo'
+      - '@visca.bot.git_hub.api.pull_request'
+    tags:
+      - { name: asynchronous_command_handler, handles: Visca\Bot\Component\GitHub\PullRequest\Merging\Command\Command\RebasePullRequestCommand }

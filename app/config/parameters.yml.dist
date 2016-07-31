@@ -17,3 +17,11 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
+
+    amqp_host:         'localhost'
+    amqp_port:         5672
+    amqp_user:         'guest'
+    amqp_password:     'guest'
+    amqp_vhost:         '/'
+
+    github_token:       ''

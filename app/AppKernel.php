@@ -15,6 +15,21 @@ class AppKernel extends Kernel
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+
+            // Messaging
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
+
+            // Command / event bus
+            new SimpleBus\AsynchronousBundle\SimpleBusAsynchronousBundle(),
+            new SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle(),
+            new SimpleBus\SymfonyBridge\SimpleBusEventBusBundle(),
+
+            // Command / event bus for rabbit mq
+            new JMS\SerializerBundle\JMSSerializerBundle(),
+            new SimpleBus\JMSSerializerBundleBridge\SimpleBusJMSSerializerBundleBridgeBundle(),
+            new SimpleBus\RabbitMQBundleBridge\SimpleBusRabbitMQBundleBridgeBundle(),
+
+            // Viscaweb
             new Visca\Bot\Bundle\GitHubBundle\GitHubBundle(),
         ];
 

@@ -1,0 +1,44 @@
+services:
+  # Merger
+  visca.bot.component.git_hub.pull_request.merging.pull_request_merger:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\PullRequestMerger
+    arguments:
+      - '@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_resolver'
+      - '@visca.bot.component.git_hub.pull_request.merging.repository.pull_request_merge'
+      - '@asynchronous_command_bus'
+      - '@logger'
+
+  # Mergable resolvers
+  visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_resolver:
+      class: Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\MergeableResolver
+      arguments:
+        - ["@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_not_behind_base_branch", "@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_tagged", "@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_not_already_merged_and_mergeable", "@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_all_checks_success"]
+
+  visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_it_was_rebased_first_resolver:
+        class: Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\MergeableResolver
+        arguments:
+          - ["@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_tagged", "@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_not_already_merged_and_mergeable", "@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_all_checks_success"]
+
+  visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_all_checks_success:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\MergeableIfAllChecksSuccess
+    arguments:
+      - '@visca.bot.component.git_hub.repositories.statuses'
+      - '@logger'
+
+  visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_tagged:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\MergeableIfTagged
+    arguments:
+      - "@visca.bot.component.git_hub.pull_request.merging.repository.pull_request_merge"
+      - "@visca.bot.git_hub.api.issue"
+      - "@logger"
+
+  visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_not_already_merged_and_mergeable:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\MergeableIfNotAlreadyMergedAndMergeable
+    arguments:
+      - "@logger"
+
+  visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_not_behind_base_branch:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\MergeableIfNotBehindBaseBranch
+    arguments:
+      - '@visca.bot.git_hub.api.repo'
+      - '@logger'

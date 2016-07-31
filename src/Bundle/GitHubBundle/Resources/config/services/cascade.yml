@@ -1,0 +1,7 @@
+services:
+  visca.bot.component.git_hub.pull_request.merging.cascade.merge_cascading:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Cascade\Strategy\MergeCascading
+    arguments:
+      - '@visca.bot.component.git_hub.pull_request.merging.repository.pull_request_merge'
+      - '@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_resolver'
+      - '@visca.bot.component.git_hub.pull_request.merging.mergeable.mergeable_if_it_was_rebased_first_resolver'

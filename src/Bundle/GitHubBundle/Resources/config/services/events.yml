@@ -1,0 +1,19 @@
+services:
+  # Subscribers
+  visca.bot.component.git_hub.pull_request.merging.event.handler.try_merge_pull_request:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Event\Handler\OnStatusWebHookReceivedEventHandler
+    arguments:
+      - '@asynchronous_command_bus'
+      - '@visca.bot.component.git_hub.pull_request.merging.repository.pull_request_merge'
+      - '@logger'
+    tags:
+      - { name: asynchronous_event_subscriber, subscribes_to: Visca\Bot\Component\GitHub\Event\Event\WebHookReceivedEvent, method: onWebHookReceived }
+
+  visca.bot.component.git_hub.pull_request.merging.event.handler.on_label_pull_request_web_hook_received_event_handler:
+    class: Visca\Bot\Component\GitHub\PullRequest\Merging\Event\Handler\OnLabelPullRequestWebHookReceivedEventHandler
+    arguments:
+      - '@asynchronous_command_bus'
+      - '@visca.bot.component.git_hub.pull_request.merging.repository.pull_request_merge'
+      - '@logger'
+    tags:
+      - { name: asynchronous_event_subscriber, subscribes_to: Visca\Bot\Component\GitHub\Event\Event\WebHookReceivedEvent, method: onWebHookReceived }
