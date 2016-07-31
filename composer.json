@@ -64,7 +64,15 @@
         "symfony-tests-dir": "tests",
         "symfony-assets-install": "relative",
         "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
+            "file": "app/config/parameters.yml",
+            "env-map": {
+                "amqp_host": "AMQP_HOST",
+                "amqp_port": "AMQP_PORT",
+                "amqp_login": "AMQP_LOGIN",
+                "amqp_password": "AMQP_PASSWORD",
+                "amqp_vhost": "AMQP_VHOST",
+                "github_token": "GITHUB_TOKEN"
+            }
         }
     }
 }
