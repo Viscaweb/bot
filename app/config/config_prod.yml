@@ -15,7 +15,7 @@ monolog:
             handler:      nested
         nested:
             type:  stream
-            path:  "php://stderr"
+            id: monolog.handler.logentries
             level: debug
         console:
             type:  console

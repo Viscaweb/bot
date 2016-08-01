@@ -71,7 +71,8 @@
                 "amqp_user": "AMQP_LOGIN",
                 "amqp_password": "AMQP_PASSWORD",
                 "amqp_vhost": "AMQP_VHOST",
-                "github_token": "GITHUB_TOKEN"
+                "github_token": "GITHUB_TOKEN",
+                "logentries_token": "LOGENTRIES_TOKEN"
             }
         }
     }

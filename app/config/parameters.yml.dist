@@ -25,3 +25,4 @@ parameters:
     amqp_vhost:         '/'
 
     github_token:       ''
+    logentries_token:   ~

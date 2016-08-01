@@ -3,3 +3,8 @@
 parameters:
 
 services:
+  # Log
+  monolog.handler.logentries:
+      class: Monolog\Handler\LogEntriesHandler
+      arguments:
+          token: %logentries_token%
