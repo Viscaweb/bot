@@ -20,6 +20,12 @@ Install
 - Setup Rabbit MQ
 - ... ?
 
+Setup
+--------------
+
+- Make sure the bot has access to the repository
+- Add the webhook to your repository (pull_request, status)
+
 
 Run
 --------------
