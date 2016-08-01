@@ -14,7 +14,7 @@ monolog:
             action_level: error
             handler:      nested
         nested:
-            type:  stream
+            type: service
             id: monolog.handler.logentries
             level: debug
         console:
