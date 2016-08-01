@@ -2,16 +2,18 @@
 
 namespace Visca\Bot\Bundle\GitHubBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Visca\Bot\Component\GitHub\Event\Event\WebHookReceivedEvent;
 
-class DefaultController extends Controller
+class WebHookController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/hook", name="github_web_hook")
+     * @Method({"POST"})
      */
     public function indexAction(Request $request)
     {

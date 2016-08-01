@@ -1,3 +1,4 @@
 app:
     resource: "@GitHubBundle/Controller/"
     type:     annotation
+    prefix:   /github
