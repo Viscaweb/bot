@@ -3,7 +3,8 @@ namespace Visca\Bot\Tests\Component\GitHub\PullRequest\Merging\Mergability;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_Assert;
-use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergability\MergableIfAllChecksSuccess;
+use Psr\Log\LoggerInterface;
+use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\MergeableIfAllChecksSuccess;
 use Visca\Bot\Component\GitHub\Repositories\Interfaces\StatusesRepositoryInterface;
 
 class MergableIfAllChecksSuccessTest extends TestCase
@@ -30,6 +31,19 @@ class MergableIfAllChecksSuccessTest extends TestCase
         $repository = 'foobar';
         $hash = '3d24b73b0dd72fd7af760f36942e8c47c20db5a4';
 
+        $pullRequest = [
+            'number' => 1,
+            'head' => [
+                'repo' => [
+                    'owner' => [
+                        'login' => $username
+                    ],
+                    'name' => $repository
+                ],
+                'sha' => $hash
+            ]
+        ];
+
         $statusRepository = $this->createStatusRepository(
             $username,
             $repository,
@@ -37,9 +51,12 @@ class MergableIfAllChecksSuccessTest extends TestCase
             $statuses
         );
 
-        $resolver = new MergableIfAllChecksSuccess($statusRepository);
+        $resolver = new MergeableIfAllChecksSuccess(
+            $statusRepository,
+            $this->getMockBuilder(LoggerInterface::class)->getMock()
+        );
 
-        return $resolver->canBeMerged($username, $repository, $hash);
+        return $resolver->canBeMerged($pullRequest)->isMergeable();
     }
 
     private function createStatusRepository($expectedUsername, $expectedRepository, $expectedHash, $statuses)

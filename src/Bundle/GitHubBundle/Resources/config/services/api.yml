@@ -1,0 +1,22 @@
+services:
+  # Client
+  visca.bot.git_hub.client:
+    class: Github\Client
+    calls:
+      - [authenticate, ["%github_token%", ~, 'http_token']]
+
+  # API
+  visca.bot.git_hub.api.repo:
+    class: Github\Api\Repo
+    factory: ['@visca.bot.git_hub.client', api]
+    arguments: ['repo']
+
+  visca.bot.git_hub.api.pull_request:
+    class: Github\Api\Repo
+    factory: ['@visca.bot.git_hub.client', api]
+    arguments: ['pull_request']
+
+  visca.bot.git_hub.api.issue:
+    class: Github\Api\Repo
+    factory: ['@visca.bot.git_hub.client', api]
+    arguments: ['issue']

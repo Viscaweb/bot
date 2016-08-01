@@ -66,3 +66,50 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:     "%amqp_host%"
+            port:     %amqp_port%
+            user:     "%amqp_user%"
+            password: "%amqp_password%"
+            vhost:    "%amqp_vhost%"
+            lazy:     false
+            connection_timeout: 3
+            read_write_timeout: 3
+
+            # requires php-amqplib v2.4.1+ and PHP5.4+
+            keepalive: false
+
+            # requires php-amqplib v2.4.1+
+            heartbeat: 0
+    producers:
+        bot_commands:
+            connection:       default
+            exchange_options: { name: 'bot_commands', type: direct }
+        bot_events:
+            connection:       default
+            exchange_options: { name: 'bot_events', type: direct }
+    consumers:
+        bot_commands:
+            connection:       default
+            exchange_options: { name: 'bot_commands', type: direct }
+            queue_options:    { name: 'bot_commands' }
+            callback:         simple_bus.rabbit_mq_bundle_bridge.commands_consumer
+        bot_events:
+            connection:       default
+            exchange_options: { name: 'bot_events', type: direct }
+            queue_options:    { name: 'bot_events' }
+            callback:         simple_bus.rabbit_mq_bundle_bridge.events_consumer
+
+simple_bus_asynchronous:
+
+event_bus:
+    logging: ~
+
+simple_bus_rabbit_mq_bundle_bridge:
+    commands:
+        producer_service_id: old_sound_rabbit_mq.bot_commands_producer
+    events:
+        producer_service_id: old_sound_rabbit_mq.bot_events_producer

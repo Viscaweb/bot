@@ -29,7 +29,9 @@
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "^2.0",
         "knplabs/github-api": "^1.7",
-        "php-http/guzzle6-adapter": "^1.1"
+        "php-http/guzzle6-adapter": "^1.1",
+        "php-amqplib/rabbitmq-bundle": "^1.10",
+        "simple-bus/rabbitmq-bundle-bridge": "^3.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
@@ -62,7 +64,16 @@
         "symfony-tests-dir": "tests",
         "symfony-assets-install": "relative",
         "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
+            "file": "app/config/parameters.yml",
+            "env-map": {
+                "amqp_host": "AMQP_HOST",
+                "amqp_port": "AMQP_PORT",
+                "amqp_user": "AMQP_LOGIN",
+                "amqp_password": "AMQP_PASSWORD",
+                "amqp_vhost": "AMQP_VHOST",
+                "github_token": "GITHUB_TOKEN",
+                "logentries_token": "LOGENTRIES_TOKEN"
+            }
         }
     }
 }

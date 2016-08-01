@@ -2,8 +2,10 @@
 namespace Visca\Bot\Tests\Component\GitHub\PullRequest\Merging;
 
 use PHPUnit_Framework_MockObject_MockObject;
-use Visca\Bot\Component\GitHub\PullRequest\Merging\Exceptions\PullRequestCanNotBeMergedException;
-use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergability\Interfaces\MergabilityResolverInterface;
+use Psr\Log\LoggerInterface;
+use SimpleBus\Message\Bus\MessageBus;
+use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\Interfaces\MergeableResolverInterface;
+use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\Verdict\MergeableVerdict;
 use Visca\Bot\Component\GitHub\PullRequest\Merging\PullRequestMerger;
 use Visca\Bot\Component\GitHub\PullRequest\Merging\Repository\Interfaces\PullRequestMergeRepositoryInterface;
 
@@ -11,12 +13,12 @@ class PullRequestMergerTest extends \PHPUnit_Framework_TestCase
 {
     public function testMergerWillMergeIfThePullRequestIsMergable()
     {
-        $alwaysMergable = new class implements MergabilityResolverInterface
+        $alwaysMergable = new class implements MergeableResolverInterface
         {
 
-            public function canBeMerged($username, $repository, $sha)
+            public function canBeMerged(array $pullRequest)
             {
-                return true;
+                return new MergeableVerdict(true, $this);
             }
         };
 
@@ -24,11 +26,26 @@ class PullRequestMergerTest extends \PHPUnit_Framework_TestCase
         $repository = "foobar";
         $base = "master";
         $head = "e2a49b2acbfdc0fae6582e35ceb4766042212ae5";
-        $message = "let's merge this";
+
+        $pullRequest = [
+            'number' => 1,
+            'head' => [
+                'repo' => [
+                    'owner' => [
+                        'login' => $username
+                    ],
+                    'name' => $repository
+                ],
+                'sha' => $head
+            ],
+            'base' => [
+                'ref' => $base
+            ]
+        ];
 
         /** @var PullRequestMergeRepositoryInterface|PHPUnit_Framework_MockObject_MockObject $pullRequestRepository */
         $pullRequestRepository = $this->getMockBuilder(PullRequestMergeRepositoryInterface::class)
-            ->setMethods(['merge'])
+            ->setMethods(['merge', 'findByCommitHash', 'findById', 'findWithMergeLabel'])
             ->getMock();
 
         $pullRequestRepository
@@ -38,25 +55,27 @@ class PullRequestMergerTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo($username),
                 $this->equalTo($repository),
                 $this->equalTo($base),
-                $this->equalTo($head),
-                $this->equalTo($message)
+                $this->equalTo($head)
             );
 
-        $merger = new PullRequestMerger($alwaysMergable, $pullRequestRepository);
+        $merger = new PullRequestMerger(
+            $alwaysMergable,
+            $pullRequestRepository,
+            $this->getMockBuilder(MessageBus::class)->getMock(),
+            $this->getMockBuilder(LoggerInterface::class)->getMock()
+        );
 
-        $merger->merge($username, $repository, $base, $head, $message);
+        $merger->merge($pullRequest);
     }
 
     public function testMergerWillNotMergeIfThePullRequestIsNotMergable()
     {
-        self::expectException(PullRequestCanNotBeMergedException::class);
-
-        $neverMergable = new class implements MergabilityResolverInterface
+        $neverMergable = new class implements MergeableResolverInterface
         {
 
-            public function canBeMerged($username, $repository, $sha)
+            public function canBeMerged(array $pullRequest)
             {
-                return false;
+                return new MergeableVerdict(false, $this);
             }
         };
 
@@ -66,10 +85,46 @@ class PullRequestMergerTest extends \PHPUnit_Framework_TestCase
             {
                 // Do nothing
             }
+
+            public function findByCommitHash($username, $repository, $hash)
+            {
+                return [];
+            }
+
+            public function findById($username, $repository, $id)
+            {
+                return null;
+            }
+
+            public function findWithMergeLabel($username, $repository)
+            {
+                return null;
+            }
         };
 
-        $merger = new PullRequestMerger($neverMergable, $pullRequestRepository);
+        $merger = new PullRequestMerger(
+            $neverMergable,
+            $pullRequestRepository,
+            $this->getMockBuilder(MessageBus::class)->getMock(),
+            $this->getMockBuilder(LoggerInterface::class)->getMock()
+        );
 
-        $merger->merge("", "", "", "", "");
+        $pullRequest = [
+            'number' => 1,
+            'head' => [
+                'repo' => [
+                    'owner' => [
+                        'login' => ''
+                    ],
+                    'name' => ''
+                ],
+                'sha' => ''
+            ],
+            'base' => [
+                'ref' => ''
+            ]
+        ];
+
+        \PHPUnit_Framework_Assert::assertFalse($merger->merge($pullRequest));
     }
 }

@@ -1,33 +1,38 @@
 <?php
-namespace Visca\Bot\Component\GitHub\PullRequest\Merging\Mergability;
+namespace Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable;
 
-use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergability\Interfaces\MergabilityResolverInterface;
+use Psr\Log\LoggerInterface;
+use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\Interfaces\MergeableResolverInterface;
+use Visca\Bot\Component\GitHub\PullRequest\Merging\Mergeable\Verdict\MergeableVerdict;
 use Visca\Bot\Component\GitHub\Repositories\Interfaces\StatusesRepositoryInterface;
 
 /**
- * Class MergableIfAllChecksSuccess
+ * Class MergeableIfAllChecksSuccess
  */
-final class MergableIfAllChecksSuccess implements MergabilityResolverInterface
+final class MergeableIfAllChecksSuccess implements MergeableResolverInterface
 {
     /** @var StatusesRepositoryInterface */
     private $statusRepository;
 
-    /**
-     * MergableIfAllChecksSuccess constructor.
-     *
-     * @param StatusesRepositoryInterface $statusRepository
-     */
-    public function __construct(StatusesRepositoryInterface $statusRepository)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(StatusesRepositoryInterface $statusRepository, LoggerInterface $logger)
     {
         $this->statusRepository = $statusRepository;
+        $this->logger = $logger;
     }
 
     /**
      * @inheritdoc
      */
-    public function canBeMerged($username, $repository, $sha)
+    public function canBeMerged(array $pullRequest)
     {
-        $statuses = $this->statusRepository->get($username, $repository, $sha);
+        $statuses = $this->statusRepository->get(
+            $pullRequest['head']['repo']['owner']['login'],
+            $pullRequest['head']['repo']['name'],
+            $pullRequest['head']['sha']
+        );
 
         $allContexts = array_unique(array_column($statuses, 'context'));
 
@@ -36,11 +41,23 @@ final class MergableIfAllChecksSuccess implements MergabilityResolverInterface
             $statusesFound = $this->multi_array_search($statuses, $expectedSuccessStatus);
 
             if (empty($statusesFound)) {
-                return false;
+                $this
+                    ->logger
+                    ->info(
+                        sprintf(
+                            'PR %d for %s/%s is not mergeable because no success check for "%s" can be found',
+                            $pullRequest['number'],
+                            $pullRequest['head']['repo']['owner']['login'],
+                            $pullRequest['head']['repo']['name'],
+                            $context
+                        )
+                    );
+
+                return new MergeableVerdict(false, $this);
             }
         }
 
-        return true;
+        return new MergeableVerdict(true, $this);
     }
 
     /**
